@@ -1,129 +1,83 @@
-let product = 'Bicicleta'
-let price = 200;
+function pasarelaPago(producto, precio) {
+    let dni = 0;
+    let nombre = '';
+    let numeroTarjeta = 0;
+    let vencimiento = '';
+    let cvv = 0;
+    let editar = false;
+    alert('Esta por comprar ' + producto + 'a $' + precio);
 
-pasarelaPago(product, price);
+    if (localStorage.getItem('dni')) editar = confirm('Desea sobrescribir los datos almacenados?');
 
+    do {
+        if (editar) {
+            dni = prompt('Ingrese DNI')
 
-
-function pasarelaPago(product, price) {
-
-    alert(`Estas por comprar ${product} a $${price}`);
-
-    const name = prompt('Ingrese su nombre por favor...');
-    validarNombre(name);
-
-    const dni = prompt('Ingrese su DNI por favor...');
-    validarDNI(dni);
-
-
-    const numeroTarjeta = prompt('Ingrese su numero de Tarjeta por favor...');
-    validarNumeroTarjeta(numeroTarjeta);
-
-    
-    const numeroCVV = prompt('Ingrese el numero de CVV...');
-    validarNumeroCVV(numeroCVV);
-
-    
-    const numeroMesVencimiento = prompt('Ingrese el mes de Vencimiento de su Trajeta: ');
-    validarMesVencimiento(numeroMesVencimiento);
-    const numeroAnioVencimiento = prompt('Ingrese el año de vencimiento de su Tarjeta: ');
-    validarAnioVencimiento(numeroAnioVencimiento);
-     
-    compararDatos();
-    
-    return alert('Compra Satisfactoria');
-
-
-    function validarNombre(name) {
-        if(!isNaN(name)) {
-            return validarNombre(prompt('Por favor ingrese un nombre valido: '));
         } else {
-            return name;
+            dni = localStorage.getItem('dni') || prompt('Ingrese DNI');
         }
-    }
+    } while (!validarDNI(dni));
 
+    nombre = localStorage.getItem('nombre') || prompt('Ingrese nombre');
 
-
-    function validarDNI(dni) {
-    
-        if(dni.length !== 8) {
-            return validarDNI(prompt('Ingrese un DNI valido: '));
+    do {
+        if (editar) {
+            numeroTarjeta = prompt('Ingrese numeroTarjeta');
         } else {
-         return dni;
+            numeroTarjeta = localStorage.getItem('numeroTarjeta') || prompt('ingrese numero de tarjeta')
         }
-    }
+    } while (!validarNumeroTarjeta(numeroTarjeta));
 
-
-    function validarNumeroTarjeta(numeroTarjeta) {
-        
-        if (numeroTarjeta.length !== 16) {
-            return validarNumeroTarjeta(prompt('Ingrese un numero de Tarjeta valido: '));
+    do {
+        if (editar) {
+            vencimiento = prompt('Ingrese el Vencimiento de su tarjeta');
         } else {
-            return numeroTarjeta;
+            vencimiento = localStorage.getItem('vencimiento') || prompt('Ingrese vencimiento');
         }
-    }
+    } while (!validarVencimiento(vencimiento));
 
-    function validarMesVencimiento(numeroMesVencimiento) {
-        if(numeroMesVencimiento > 12 || numeroMesVencimiento < 01) {
-            return validarMesVencimiento(prompt('Ingrese un numero de Mes valido: '));
+    do {
+        if (editar) {
+            cvv = prompt('Ingrese cvv');
         } else {
-            return numeroMesVencimiento;
+            cvv = localStorage.getItem('cvv') || prompt('Ingrese cvv');
         }
+    } while (!validarCvv(cvv));
+
+    if (confirm('Desea que guardemos sus datos para la siguiente transaccion?')) {
+        localStorage.setItem('dni', dni);
+        localStorage.setItem('nombre', nombre);
+        localStorage.setItem('numeroTarjeta', numeroTarjeta);
+        localStorage.setItem('vencimiento', vencimiento);
+        localStorage.setItem('cvv', cvv);
+    } else {
+        localStorage.removeItem('dni');
+        localStorage.removeItem('nombre');
+        localStorage.removeItem('numeroTarjeta');
+        localStorage.removeItem('vencimiento');
+        localStorage.removeItem('cvv');
     }
 
-    function validarAnioVencimiento(numeroAnioVencimiento) {
-        if(numeroAnioVencimiento > 2050 || numeroAnioVencimiento < 2020) {
-            return validarAnioVencimiento(prompt('Ingrese un numero de Año valido: '));
-        } else {
-            return numeroAnioVencimiento;
-        }
-    }
-
-
-    function validarNumeroCVV(numeroCVV) {
-        if(numeroCVV.length !== 3) {
-            return validarNumeroCVV(prompt('Ingrese numero CVV valido: '));
-        } else {
-            return numeroCVV;
-        }
-    }
-
-
-    function guardarDatos(consultaUsuario) {
-        if(consultaUsuario === 'si'){
-        
-        let userDataName = name;
-        let userDataDNI = dni;
-        let userDataCardNumber = numeroTarjeta;
-
-        localStorage.setItem('userDataName', userDataName);
-        localStorage.setItem('userDataDNI', userDataDNI);
-        localStorage.setItem('userDataCard', userDataCardNumber);
-
-        } else if(consultaUsuario === 'no') {
-            return localStorage.clear();
-        }
-    }
-
-    function modificarDatos(consultaUsuarioModificacion) {
-        if (consultaUsuarioModificacion === 'si') {
-            localStorage.clear();
-            window.location.reload();
-        }
-    }
-
-    function compararDatos() {
-        const consultaUsuario = prompt('Desea guardar sus datos personales para una proxima compra?\n Responda: SI/NO').toLowerCase();
-        if(consultaUsuario === 'si') {
-            guardarDatos(consultaUsuario);
-        } else if(localStorage.getItem('userDataDNI')!==null) {
-            const consultaUsuarioModificacion = prompt('Sus datos se encontraban guardados, desea modificarlos?\n Responda: SI/NO').toLowerCase();
-            modificarDatos(consultaUsuarioModificacion);
-        }
-    }
-
+    return 'El pago fue exitoso!'
 }
 
+function validarDNI(dni) {
+    return dni && dni.length === 8;
+}
+
+function validarNumeroTarjeta(numeroTarjeta) {
+    return numeroTarjeta && numeroTarjeta.length === 16;
+}
+
+function validarVencimiento(vencimiento) {
+    return vencimiento && vencimiento.length === 5 && vencimiento.indexOf("/") !== -1;
+}
+
+function validarCvv(cvv) {
+    return cvv && cvv.length === 3;
+}
+
+pasarelaPago('Bicicleta', 200);
 
 
 
